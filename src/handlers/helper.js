@@ -16,6 +16,12 @@ export const handleConnection = (socket, userUUID) => {
 };
 
 export const handleEvent = (io, socket, data) => {
+  if (!CLIENT_VERSION.includes(data.clientVersion)) {
+    // 만약 일치하는 버전이 없다면 response 이벤트로 fail 결과를 전송합니다.
+    socket.emit('response', { status: 'fail', message: 'Client version mismatch' });
+    return;
+  }
+
   const handler = handlerMappings[data.handlerId];
   if (!handler) {
     socket.emit('response', { status: 'fail', message: 'Handler not found' });

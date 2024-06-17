@@ -1,6 +1,7 @@
 import { Base } from './base.js';
 import { Monster } from './monster.js';
 import { Tower } from './tower.js';
+import { CLIENT_VERSION } from './Constants.js';
 
 /* 
   어딘가에 엑세스 토큰이 저장이 안되어 있다면 로그인을 유도하는 코드를 여기에 추가해주세요!
@@ -238,7 +239,8 @@ function initGame() {
   gameLoop(); // 게임 루프 최초 실행
   isInitGame = true;
 }
-
+let userId = localStorage.getItem('userId');
+console.log(userId);
 // 이미지 로딩 완료 후 서버와 연결하고 게임 초기화
 Promise.all([
   new Promise((resolve) => (backgroundImage.onload = resolve)),
@@ -248,23 +250,24 @@ Promise.all([
   ...monsterImages.map((img) => new Promise((resolve) => (img.onload = resolve))),
 ]).then(() => {
   /* 서버 접속 코드 (여기도 완성해주세요!) */
-  let somewhere;
   serverSocket = io('http://localhost:8080', {
-    auth: {
-      token: somewhere, // 토큰이 저장된 어딘가에서 가져와야 합니다!
+    query: {
+      clientVersion: CLIENT_VERSION,
+      uuid: userId,
     },
   });
 
-  let userId = null;
   serverSocket.on('response', (data) => {
     handleResponse(data);
   });
 
   serverSocket.on('connection', (data) => {
     console.log('connection: ', data);
-    userId = data.uuid;
+    if (!userId) {
+      localStorage.setItem('userId', data.uuid);
+      userId = data.uuid;
+    }
   });
-
   /* 
     서버의 이벤트들을 받는 코드들은 여기다가 쭉 작성해주시면 됩니다! 
     e.g. serverSocket.on("...", () => {...});
@@ -273,6 +276,9 @@ Promise.all([
       initGame();
     }
   */
+  if (!isInitGame) {
+    initGame();
+  }
 });
 
 const buyTowerButton = document.createElement('button');
