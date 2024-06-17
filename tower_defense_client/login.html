@@ -60,6 +60,14 @@
       const username = document.getElementById("username").value;
       const password = document.getElementById("password").value;
 
+      if (username.trim().length === 0) {
+        alert("아이디를 입력해주세요.");
+        return;
+      }
+      if (password.trim().length === 0) {
+        alert("비밀번호를 입력해주세요.");
+        return;
+      }
       /* 
         로그인 API 호출 후 로그인 성공 시 index.html로 이동시켜주세요!
         이 때, 엑세스 토큰은 어딘가에 저장을 해놔야겠죠?! 
