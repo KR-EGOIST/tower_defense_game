@@ -21,7 +21,7 @@ let baseHp = 0; // 기지 체력
 let towerCost = 0; // 타워 구입 비용
 let numOfInitialTowers = 0; // 초기 타워 개수
 let monsterLevel = 0; // 몬스터 레벨
-let monsterSpawnInterval = 0; // 몬스터 생성 주기
+let monsterSpawnInterval = 5000; // 몬스터 생성 주기
 const monsters = [];
 const towers = [];
 
@@ -220,6 +220,16 @@ function gameLoop() {
     } else {
       /* 몬스터가 죽었을 때 */
       monsters.splice(i, 1);
+      sendEvent(21, {});
+      score += 100;
+
+      if (score % 2000 === 0) {
+        monsterLevel += 1;
+        userGold += 1000;
+        if (monsterSpawnInterval !== 1000) {
+          monsterSpawnInterval -= 500;
+        }
+      }
     }
   }
 

@@ -1,6 +1,10 @@
 import handlerMappings from './handlerMapping.js';
 
 export const handleResponse = (data) => {
+  if (data.status === 'fail') {
+    console.log(data);
+    return;
+  }
   const handler = handlerMappings[data.handlerId];
   if (!handler) {
     return;
