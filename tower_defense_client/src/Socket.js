@@ -1,7 +1,8 @@
+import { CLIENT_VERSION } from './constants.js';
+
 const socket = io('http://localhost:3000', {
   query: {
     clientVersion: CLIENT_VERSION,
-    userId: 'admin1',
   },
 });
 
