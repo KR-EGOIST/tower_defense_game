@@ -3,7 +3,6 @@ import { Monster } from './monster.js';
 import { Tower } from './tower.js';
 import { CLIENT_VERSION } from './Constants.js';
 import { handleResponse } from '../handlers/helper.js';
-import { prisma } from '../../src/utils/prisma/index.js';
 
 /* 
   어딘가에 엑세스 토큰이 저장이 안되어 있다면 로그인을 유도하는 코드를 여기에 추가해주세요!
@@ -154,7 +153,7 @@ function placeInitialTowers() {
     const tower = new Tower(x, y, towerCost);
     towers.push(tower);
     tower.draw(ctx, towerImage);
-    sendEvent(3, { X: x, Y: y});
+    sendEvent(3, { X: x, Y: y });
   }
 }
 
