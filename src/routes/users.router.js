@@ -10,10 +10,10 @@ const router = express.Router();
 
 /** 사용자 회원가입 API **/
 router.post('/sign-up', async (req, res, next) => {
-  const { email, password } = req.body;
+  const { id, password } = req.body;
   const isExistUser = await prisma.users.findFirst({
     where: {
-      email,
+      id,
     },
   });
 
@@ -26,7 +26,7 @@ router.post('/sign-up', async (req, res, next) => {
 
   // Users 테이블에 사용자를 추가합니다.
   const user = await prisma.users.create({
-    data: { email, password: hashedPassword },
+    data: { id, password: hashedPassword },
   });
 
   return res.status(200).json({ message: '회원가입이 완료되었습니다.' });
