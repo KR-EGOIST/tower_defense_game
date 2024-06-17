@@ -3,7 +3,6 @@ import { Monster } from './monster.js';
 import { Tower } from './tower.js';
 import { CLIENT_VERSION } from './Constants.js';
 import { handleResponse } from '../handlers/helper.js';
-import { prisma } from '../../src/utils/prisma/index.js';
 
 /* 
   어딘가에 엑세스 토큰이 저장이 안되어 있다면 로그인을 유도하는 코드를 여기에 추가해주세요!
@@ -19,7 +18,7 @@ let userGold = 0; // 유저 골드
 let base; // 기지 객체
 let baseHp = 0; // 기지 체력
 
-let towerCost = 0; // 타워 구입 비용
+let towerCost = 600; // 타워 구입 비용
 let numOfInitialTowers = 3; // 초기 타워 개수
 let monsterLevel = 0; // 몬스터 레벨
 let monsterSpawnInterval = 5000; // 몬스터 생성 주기
@@ -163,10 +162,15 @@ function placeNewTower() {
     타워를 구입할 수 있는 자원이 있을 때 타워 구입 후 랜덤 배치하면 됩니다.
     빠진 코드들을 채워넣어주세요! 
   */
-  const { x, y } = getRandomPositionNearPath(200);
-  const tower = new Tower(x, y);
-  towers.push(tower);
-  tower.draw(ctx, towerImage);
+  if (userGold >= towerCost) {
+    const { x, y } = getRandomPositionNearPath(200);
+    const tower = new Tower(x, y);
+    towers.push(tower);
+    tower.draw(ctx, towerImage);
+    userGold -= towerCost;
+  } else {
+    alert(`타워 구매비용은 ${towerCost}원 입니다`);
+  }
 }
 
 function placeBase() {
