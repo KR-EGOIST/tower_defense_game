@@ -6,9 +6,21 @@
 
 generator client {
   provider = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+model Users {
+  userId    Int       @id @default(autoincrement()) @map("userId")
+  id        String    @unique @map("id")
+  password  String    @map("password")
+  score     Int       @map("score")
+  createdAt DateTime  @default(now()) @map("createdAt")
+  updatedAt DateTime  @updatedAt @map("updatedAt")
+
+  @@map("Users")
 }
