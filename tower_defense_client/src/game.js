@@ -2,6 +2,7 @@ import { Base } from './base.js';
 import { Monster } from './monster.js';
 import { Tower } from './tower.js';
 import { CLIENT_VERSION } from './Constants.js';
+import { handleResponse } from '../handlers/helper.js';
 
 /* 
   어딘가에 엑세스 토큰이 저장이 안되어 있다면 로그인을 유도하는 코드를 여기에 추가해주세요!
@@ -295,7 +296,7 @@ buyTowerButton.addEventListener('click', placeNewTower);
 document.body.appendChild(buyTowerButton);
 
 const sendEvent = (handlerId, payload) => {
-  socket.emit('event', {
+  serverSocket.emit('event', {
     userId,
     clientVersion: CLIENT_VERSION,
     handlerId,
