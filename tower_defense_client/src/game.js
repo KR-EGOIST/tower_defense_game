@@ -168,6 +168,7 @@ function placeNewTower() {
     const tower = new Tower(x, y);
     towers.push(tower);
     tower.draw(ctx, towerImage);
+    sendEvent(3, { X: x, Y: y });
     userGold -= towerCost;
   } else {
     alert(`타워 구매비용은 ${towerCost}원 입니다`);
@@ -234,7 +235,7 @@ function gameLoop() {
 
       if (score % 2000 === 0) {
         monsterLevel += 1;
-        
+
         userGold += 1000;
         //setInterval(spawnMonster, monsterSpawnInterval);
         if (monsterSpawnInterval !== 1000) {
