@@ -22,6 +22,7 @@ let towerCost = 600; // 타워 구입 비용
 let numOfInitialTowers = 3; // 초기 타워 개수
 let monsterLevel = 0; // 몬스터 레벨
 let monsterSpawnInterval = 5000; // 몬스터 생성 주기
+let intervalId = null;
 const monsters = [];
 const towers = [];
 
@@ -233,9 +234,12 @@ function gameLoop() {
 
       if (score % 2000 === 0) {
         monsterLevel += 1;
+        
         userGold += 1000;
+        //setInterval(spawnMonster, monsterSpawnInterval);
         if (monsterSpawnInterval !== 1000) {
           monsterSpawnInterval -= 500;
+          startSpawning();
         }
       }
     }
@@ -254,7 +258,8 @@ function initGame() {
   placeInitialTowers(); // 설정된 초기 타워 개수만큼 사전에 타워 배치
   placeBase(); // 기지 배치
 
-  setInterval(spawnMonster, monsterSpawnInterval); // 설정된 몬스터 생성 주기마다 몬스터 생성
+  startSpawning(); // 몬스터 생성 시작
+  //setInterval(spawnMonster, monsterSpawnInterval); // 설정된 몬스터 생성 주기마다 몬스터 생성
   gameLoop(); // 게임 루프 최초 실행
   isInitGame = true;
 }
@@ -307,6 +312,15 @@ Promise.all([
     initGame();
   }
 });
+
+function startSpawning() {
+  // 기존 interval이 있다면 중지
+  if (intervalId !== null) {
+    clearInterval(intervalId);
+  }
+  // 새로운 interval 시작
+  intervalId = setInterval(spawnMonster, monsterSpawnInterval);
+}
 
 const buyTowerButton = document.createElement('button');
 buyTowerButton.textContent = '타워 구입';
