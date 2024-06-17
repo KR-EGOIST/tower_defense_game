@@ -249,10 +249,20 @@ Promise.all([
 ]).then(() => {
   /* 서버 접속 코드 (여기도 완성해주세요!) */
   let somewhere;
-  serverSocket = io('서버주소', {
+  serverSocket = io('http://localhost:8080', {
     auth: {
       token: somewhere, // 토큰이 저장된 어딘가에서 가져와야 합니다!
     },
+  });
+
+  let userId = null;
+  serverSocket.on('response', (data) => {
+    handleResponse(data);
+  });
+
+  serverSocket.on('connection', (data) => {
+    console.log('connection: ', data);
+    userId = data.uuid;
   });
 
   /* 
@@ -277,3 +287,14 @@ buyTowerButton.style.cursor = 'pointer';
 buyTowerButton.addEventListener('click', placeNewTower);
 
 document.body.appendChild(buyTowerButton);
+
+const sendEvent = (handlerId, payload) => {
+  socket.emit('event', {
+    userId,
+    clientVersion: CLIENT_VERSION,
+    handlerId,
+    payload,
+  });
+};
+
+export { sendEvent };
