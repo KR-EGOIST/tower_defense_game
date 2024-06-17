@@ -19,6 +19,7 @@ model Users {
   id        String    @unique @map("id")
   password  String    @map("password")
   score     Int       @default(0) @map("score")
+  uuid      String    @default("") @map("uuid")
   createdAt DateTime  @default(now()) @map("createdAt")
   updatedAt DateTime  @updatedAt @map("updatedAt")
 

@@ -1,10 +1,26 @@
+import { prisma } from '../utils/prisma/index.js';
+import { authMiddleware } from '../middlewares/auth.middleware.js';
+
 const users = [];
 
 // 서버 메모리에 유저의 세션(소켓ID)을 저장
 // 이때 유저는 객체 형태로 저장
 // { uuid: string; socketId: string; };
-export const addUser = (user) => {
-  users.push(user);
+export const addUser = async (user) => {
+  const data = {
+    uuid: user.uuid,
+    socketId: user.socketId,
+  };
+  users.push(data);
+
+  const userData = await authMiddleware(user.token);
+  const { userId } = userData;
+  await prisma.users.update({
+    where: { userId: userId },
+    data: {
+      uuid: user.uuid,
+    },
+  });
 };
 
 // 배열에서 유저 삭제

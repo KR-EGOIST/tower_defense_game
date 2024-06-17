@@ -3,6 +3,7 @@ import { Monster } from './monster.js';
 import { Tower } from './tower.js';
 import { CLIENT_VERSION } from './Constants.js';
 import { handleResponse } from '../handlers/helper.js';
+import { prisma } from '../../src/utils/prisma/index.js';
 
 /* 
   어딘가에 엑세스 토큰이 저장이 안되어 있다면 로그인을 유도하는 코드를 여기에 추가해주세요!
@@ -240,8 +241,15 @@ function initGame() {
   gameLoop(); // 게임 루프 최초 실행
   isInitGame = true;
 }
+
 let userId = localStorage.getItem('userId');
-console.log(userId);
+function getCookieValue(name) {
+  const regex = new RegExp(`(^| )${name}=([^;]+)`);
+  const match = document.cookie.match(regex);
+  if (match) {
+    return match[2];
+  }
+}
 // 이미지 로딩 완료 후 서버와 연결하고 게임 초기화
 Promise.all([
   new Promise((resolve) => (backgroundImage.onload = resolve)),
@@ -255,6 +263,7 @@ Promise.all([
     query: {
       clientVersion: CLIENT_VERSION,
       uuid: userId,
+      token: getCookieValue('authorization'),
     },
   });
 
