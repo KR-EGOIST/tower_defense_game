@@ -1,4 +1,5 @@
 import { getUsers, removeUser } from '../models/user.model.js';
+import handlerMappings from './handlerMapping.js';
 
 export const handleDisconnect = (socket, uuid) => {
   removeUser(socket.id); // 사용자 삭제
