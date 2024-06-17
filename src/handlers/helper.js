@@ -16,11 +16,6 @@ export const handleConnection = (socket, userUUID) => {
 };
 
 export const handleEvent = (io, socket, data) => {
-  if (!CLIENT_VERSION.includes(data.clientVersion)) {
-    socket.emit('response', { status: 'fail', message: 'Client version mismatch' });
-    return;
-  }
-
   const handler = handlerMappings[data.handlerId];
   if (!handler) {
     socket.emit('response', { status: 'fail', message: 'Handler not found' });
