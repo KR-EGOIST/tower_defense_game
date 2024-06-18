@@ -48,6 +48,7 @@
   <canvas id="gameCanvas" width="1920" height="1080"></canvas>
   <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
   <script type="module">
+    // 저장된 토큰 가져오는 getCookieValue함수
     function getCookieValue(name) {
       const regex = new RegExp(`(^| )${name}=([^;]+)`)
       const match = document.cookie.match(regex)
