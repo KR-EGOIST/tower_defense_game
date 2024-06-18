@@ -400,4 +400,12 @@ const sendEvent = (handlerId, payload) => {
   });
 };
 
-export { sendEvent };
+function getUserGold() {
+  return userGold;
+}
+
+function setUserGold(gold) {
+  userGold = gold;
+}
+
+export { sendEvent, getUserGold, setUserGold };
