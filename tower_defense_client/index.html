@@ -46,8 +46,7 @@
     <button id="playButton">게임 플레이</button>
   </div>
   <canvas id="gameCanvas" width="1920" height="1080"></canvas>
-  <audio loop controls id="music">
-  </audio>
+  <div id="song"></div>
   <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
   <script type="module">
     // 저장된 토큰 가져오는 getCookieValue함수
@@ -74,7 +73,7 @@
         window.location.href = 'login.html';
         return;
       }
-      addAudio();
+      playSong(currentMusic);
       document.querySelector('.button-container').style.display = 'none';
       document.getElementById('gameCanvas').style.display = 'block';
       const module = await import('./src/game.js');
@@ -87,17 +86,31 @@
       const clickArea = document.getElementById('gameCanvas');
       clickArea.addEventListener('click', handleClick);
     });
+    // 음악 첫 곡은 랜덤, 이후 부터는 순차 재생
+    const songs = ["game-bgm1.mp3", "game-bgm2.mp3", "game-bgm3.mp3"];
+    const song = new Audio();
+    let currentMusic = Math.floor(Math.random() * songs.length);
+    const len = songs.length;
 
-    function addAudio() {
-      const fileArray = ["game-bgm1.mp3", "game-bgm2.mp3", "game-bgm3.mp3"];
-      const num = Math.floor(Math.random() * fileArray.length);
-      const music = document.getElementById("music");
-      music.innerHTML = "";
-      // <source src="./bgm/game-bgm.mp3" type="audio/mp3">
-      music.innerHTML += '<source src="./bgm/' + fileArray[num] + '" type="audio/mpeg">';
-      music.volume = 0.5;
-      music.play();
+    const songContainer = document.getElementById("song");
+    songContainer.appendChild(song);
+
+    function playSong(index) {
+      song.src = "./bgm/" + songs[index];
+      song.controls = true;
+      song.autoplay = true;
+      song.volume = 0.5;
+      song.play();
     }
+    song.addEventListener("ended", function playNextS() {
+      currentMusic++;
+      if (currentMusic == len) {
+        currentMusic = 0;
+        playSong(currentMusic);
+      } else {
+        playSong(currentMusic);
+      }
+    })
   </script>
 </body>
 
