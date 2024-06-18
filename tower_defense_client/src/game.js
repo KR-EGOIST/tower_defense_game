@@ -141,19 +141,16 @@ function getRandomPositionNearPath(maxDistance) {
     y: posY + offsetY,
   };
 }
-
+ 
 function placeInitialTowers() {
-  /* 
-    타워를 초기에 배치하는 함수입니다.
-    무언가 빠진 코드가 있는 것 같지 않나요? 
-  */
-  //clear tower
-  sendEvent(2);
+  sendEvent(2); //게임이 시작될 때 타워를 비우기
+
   for (let i = 0; i < numOfInitialTowers; i++) {
     const { x, y } = getRandomPositionNearPath(200);
     const tower = new Tower(x, y, towerCost);
     towers.push(tower);
     tower.draw(ctx, towerImage);
+    //타워가 생성될 때, 좌표를 서버에 저장한다.
     sendEvent(3, { X: x, Y: y });
   }
 }
@@ -260,7 +257,6 @@ function initGame() {
   placeBase(); // 기지 배치
 
   startSpawning(); // 몬스터 생성 시작
-  //setInterval(spawnMonster, monsterSpawnInterval); // 설정된 몬스터 생성 주기마다 몬스터 생성
   gameLoop(); // 게임 루프 최초 실행
   isInitGame = true;
 }
@@ -314,6 +310,7 @@ Promise.all([
   }
 });
 
+//몬스터의 스폰주기 설정
 function startSpawning() {
   // 기존 interval이 있다면 중지
   if (intervalId !== null) {
