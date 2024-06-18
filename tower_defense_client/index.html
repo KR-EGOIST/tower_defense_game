@@ -45,6 +45,7 @@
       <button id="playButton">게임 플레이</button>
     </div>
     <canvas id="gameCanvas" width="1920" height="1080"></canvas>
+    <audio loop controls id="music"></audio>
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script type="module">
       // 저장된 토큰 가져오는 getCookieValue함수
@@ -66,17 +67,27 @@
 
       document.getElementById('playButton').addEventListener('click', async () => {
         const authorization = getCookieValue('authorization');
-
         if (!authorization) {
           alert('로그인을 해주세요!');
           window.location.href = 'login.html';
           return;
         }
-
+        addAudio();
         document.querySelector('.button-container').style.display = 'none';
         document.getElementById('gameCanvas').style.display = 'block';
-        import('./src/game.js');
+        const module = await import('./src/game.js');
       });
+
+      function addAudio() {
+        const fileArray = ['game-bgm1.mp3', 'game-bgm2.mp3', 'game-bgm3.mp3'];
+        const num = Math.floor(Math.random() * fileArray.length);
+        const music = document.getElementById('music');
+        music.innerHTML = '';
+        // <source src="./bgm/game-bgm.mp3" type="audio/mp3">
+        music.innerHTML += '<source src="./bgm/' + fileArray[num] + '" type="audio/mpeg">';
+        music.volume = 0.5;
+        music.play();
+      }
     </script>
   </body>
 </html>
