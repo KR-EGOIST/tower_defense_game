@@ -4,19 +4,20 @@ import { Tower } from './tower.js';
 import { CLIENT_VERSION } from './Constants.js';
 import { handleResponse } from '../handlers/helper.js';
 
-/* 
-  어딘가에 엑세스 토큰이 저장이 안되어 있다면 로그인을 유도하는 코드를 여기에 추가해주세요!
-*/
-
 let serverSocket; // 서버 웹소켓 객체
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
+
+// 로그인 아이디를 로컬스토리지에서 가져온다.
+let id = localStorage.getItem('userId');
+// uuid를 저장할 userId 변수
+let userId;
 
 const NUM_OF_MONSTERS = 5; // 몬스터 개수
 
 let userGold = 0; // 유저 골드
 let base; // 기지 객체
-let baseHp = 0; // 기지 체력
+let baseHp = 50; // 기지 체력
 
 let towerCost = 600; // 타워 구입 비용
 let numOfInitialTowers = 3; // 초기 타워 개수
@@ -144,18 +145,17 @@ function getRandomPositionNearPath(maxDistance) {
 }
 
 function placeInitialTowers() {
-  /* 
-    타워를 초기에 배치하는 함수입니다.
-    무언가 빠진 코드가 있는 것 같지 않나요? 
-  */
-  //clear tower
-  sendEvent(2);
+  sendEvent(2); //게임이 시작될 때 타워를 비우기
+
   for (let i = 0; i < numOfInitialTowers; i++) {
     const { x, y } = getRandomPositionNearPath(200);
+
+    //타워가 생성될 때, 좌표를 서버에 저장한다. 타워가 생성되기 전에 검증한다.
+    sendEvent(3, { X: x, Y: y, gameTowers: towers });
+
     const tower = new Tower(x, y, towerCost);
     towers.push(tower);
     tower.draw(ctx, towerImage);
-    sendEvent(3, { X: x, Y: y });
   }
 }
 
@@ -168,6 +168,10 @@ function placeNewTower() {
   // 유저가 가진 골드가 타워 금액(600원)보다 크거나 같다면 유저골드 차감 후 타워구매
   if (userGold >= towerCost) {
     const { x, y } = getRandomPositionNearPath(200);
+
+    //타워가 생성될 때, 좌표를 서버에 저장한다. 타워가 생성되기 전에 검증한다.
+    sendEvent(3, { X: x, Y: y, gameTowers: towers });
+
     const tower = new Tower(x, y);
     towers.push(tower);
     tower.draw(ctx, towerImage);
@@ -269,6 +273,7 @@ function gameLoop() {
     if (monster.hp > 0) {
       const isDestroyed = monster.move(base);
       if (isDestroyed) {
+        sendEvent(12, {});
         /* 게임 오버 */
         alert('게임 오버. 스파르타 본부를 지키지 못했다...ㅠㅠ');
         location.reload();
@@ -278,7 +283,7 @@ function gameLoop() {
       /* 몬스터가 죽었을 때 */
       monsters.splice(i, 1);
       sendEvent(21, {});
-      score += 100;
+      score += 2000;
 
       if (score % 2000 === 0) {
         monsterLevel += 1;
@@ -300,19 +305,17 @@ function initGame() {
   if (isInitGame) {
     return;
   }
-
+  sendEvent(11, {});
   monsterPath = generateRandomMonsterPath(); // 몬스터 경로 생성
   initMap(); // 맵 초기화 (배경, 몬스터 경로 그리기)
   placeInitialTowers(); // 설정된 초기 타워 개수만큼 사전에 타워 배치
   placeBase(); // 기지 배치
 
   startSpawning(); // 몬스터 생성 시작
-  //setInterval(spawnMonster, monsterSpawnInterval); // 설정된 몬스터 생성 주기마다 몬스터 생성
   gameLoop(); // 게임 루프 최초 실행
   isInitGame = true;
 }
 
-let userId = localStorage.getItem('userId');
 function getCookieValue(name) {
   const regex = new RegExp(`(^| )${name}=([^;]+)`);
   const match = document.cookie.match(regex);
@@ -332,7 +335,7 @@ Promise.all([
   serverSocket = io('http://localhost:8080', {
     query: {
       clientVersion: CLIENT_VERSION,
-      uuid: userId,
+      id: id,
       token: getCookieValue('authorization'),
     },
   });
@@ -343,6 +346,7 @@ Promise.all([
 
   serverSocket.on('connection', (data) => {
     console.log('connection: ', data);
+
     if (!userId) {
       localStorage.setItem('userId', data.uuid);
       userId = data.uuid;
@@ -363,15 +367,15 @@ Promise.all([
     서버의 이벤트들을 받는 코드들은 여기다가 쭉 작성해주시면 됩니다! 
     e.g. serverSocket.on("...", () => {...});
     이 때, 상태 동기화 이벤트의 경우에 아래의 코드를 마지막에 넣어주세요! 최초의 상태 동기화 이후에 게임을 초기화해야 하기 때문입니다! 
-    if (!isInitGame) {
-      initGame();
-    }
-  */
+
+    userId = data.uuid;
+*/
   if (!isInitGame) {
     initGame();
   }
 });
 
+//몬스터의 스폰주기 설정
 function startSpawning() {
   // 기존 interval이 있다면 중지
   if (intervalId !== null) {
