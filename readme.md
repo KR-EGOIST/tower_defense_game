@@ -35,6 +35,10 @@
 
 ### [API명세서]
 
+## 📄 패킷 구조
+
+### [패킷 구조](https://industrious-lasagna-717.notion.site/Node-js-f4e53d9a013f4ae78a531d148f44f68e?pvs=4)
+
 ## ERD Diagram
 
 ### [ERD 사진]
