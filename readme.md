@@ -43,6 +43,10 @@
 
 ### [패킷 구조](https://industrious-lasagna-717.notion.site/Node-js-f4e53d9a013f4ae78a531d148f44f68e?pvs=4)
 
+## 와이어 프레임
+
+![Blank diagram](https://github.com/KR-EGOIST/tower_defense_game/assets/54177070/181cebb2-1952-42cc-a2f3-11e9b791a60c)
+
 ## ERD Diagram
 
 ### [ERD 사진]
