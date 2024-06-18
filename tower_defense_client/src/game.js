@@ -273,7 +273,7 @@ function gameLoop() {
     if (monster.hp > 0) {
       const isDestroyed = monster.move(base);
       if (isDestroyed) {
-        sendEvent(12, {});
+        sendEvent(12, { score: score, token: getCookieValue('authorization') });
         /* 게임 오버 */
         alert('게임 오버. 스파르타 본부를 지키지 못했다...ㅠㅠ');
         location.reload();
@@ -346,6 +346,8 @@ Promise.all([
 
   serverSocket.on('connection', (data) => {
     console.log('connection: ', data);
+    userId = data.uuid;
+    highScore = data.highScore;
 
     if (!userId) {
       localStorage.setItem('userId', data.uuid);
