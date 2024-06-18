@@ -301,7 +301,6 @@ Promise.all([
     userId = data.uuid;
     highScore = data.highScore;
 
-    console.log(highScore);
     if (!isInitGame) {
       initGame();
     }
