@@ -75,15 +75,7 @@
         playSong(currentMusic);
         document.querySelector('.button-container').style.display = 'none';
         document.getElementById('gameCanvas').style.display = 'block';
-        const module = await import('./src/game.js');
-
-        function handleClick(event) {
-          console.log(event.clientX + ', ' + event.clientY);
-          module.sendEvent(4, { X: event.clientX, Y: event.clientY });
-        }
-
-        const clickArea = document.getElementById('gameCanvas');
-        clickArea.addEventListener('click', handleClick);
+        import('./src/game.js');
       });
       // 음악 첫 곡은 랜덤, 이후 부터는 순차 재생
       const songs = ['game-bgm1.mp3', 'game-bgm2.mp3', 'game-bgm3.mp3'];
