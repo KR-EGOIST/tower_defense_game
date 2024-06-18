@@ -75,15 +75,7 @@
 
         document.querySelector('.button-container').style.display = 'none';
         document.getElementById('gameCanvas').style.display = 'block';
-        const module = await import('./src/game.js');
-
-        function handleClick(event) {
-          console.log(event.clientX + ', ' + event.clientY);
-          module.sendEvent(4, { X: event.clientX, Y: event.clientY });
-        }
-
-        const clickArea = document.getElementById('gameCanvas');
-        clickArea.addEventListener('click', handleClick);
+        import('./src/game.js');
       });
     </script>
   </body>

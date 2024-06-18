@@ -14,7 +14,10 @@ function compareTowers(currentTowers, gameTowers) {
     const gameTowerPosition = gameTowers[i];
 
     //좌표를 비교
-    if (currentTower.tower.X !== gameTowerPosition.x || currentTower.tower.Y !== gameTowerPosition.y) {
+    if (
+      currentTower.tower.X !== gameTowerPosition.x ||
+      currentTower.tower.Y !== gameTowerPosition.y
+    ) {
       return true; //차이가 있음
     }
   }
@@ -48,23 +51,4 @@ export const towerClearHandler = () => {
   return { status: 'success', message: 'Tower Clear' };
 };
 
-export const checkTowerLocation = (userId, payload) => {
-  const towers = getTowers(userId);
-  if (!towers) {
-    return { status: 'fail', message: 'Not found towers' };
-  }
-
-  console.log(towers);
-
-  towers.forEach((element) => {
-    if (
-      element.tower.X < payload.X ||
-      (element.tower.X + 80 > payload.X && element.tower.Y < payload.Y) ||
-      element.tower.Y + 170 > payload.Y
-    ) {
-      console.log('tttttt');
-    }
-  });
-
-  return { status: 'success' };
-};
+export const upgradeTower = (userId, payload) => {};
