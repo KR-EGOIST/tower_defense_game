@@ -30,6 +30,7 @@ const towers = [];
 let score = 0; // 게임 점수
 let highScore = 0; // 기존 최고 점수
 let isInitGame = false;
+let isRefundMode = false; // 타워 환불 모드(기본off)
 
 // 이미지 로딩 파트
 const backgroundImage = new Image();
@@ -158,11 +159,13 @@ function placeInitialTowers() {
   }
 }
 
+// 타워 구입
 function placeNewTower() {
   /* 
     타워를 구입할 수 있는 자원이 있을 때 타워 구입 후 랜덤 배치하면 됩니다.
     빠진 코드들을 채워넣어주세요! 
   */
+  // 유저가 가진 골드가 타워 금액(600원)보다 크거나 같다면 유저골드 차감 후 타워구매
   if (userGold >= towerCost) {
     const { x, y } = getRandomPositionNearPath(200);
 
@@ -172,11 +175,55 @@ function placeNewTower() {
     const tower = new Tower(x, y);
     towers.push(tower);
     tower.draw(ctx, towerImage);
+    console.log(`타워 위치: X=${tower.x}, Y=${tower.y}`);
     userGold -= towerCost;
   } else {
     alert(`타워 구매비용은 ${towerCost}원 입니다`);
   }
 }
+
+// 타워 환불 모드
+function toggleRefundMode() {
+  isRefundMode = !isRefundMode;
+  alert(isRefundMode ? '타워 환불 모드 활성화' : '타워 환불 모드 비활성화');
+}
+
+//타워 클릭 이벤트
+canvas.addEventListener('click', (event) => {
+  if (isRefundMode) {
+    const rect = canvas.getBoundingClientRect();
+    const clickX = event.clientX - rect.left;
+    const clickY = event.clientY - rect.top;
+    const refundRangeX = 35;
+    const refundRangeY = 75;
+    const toleranceY = 10;
+    let refunded = false;
+    console.log(`마우스 클릭 위치: X=${clickX}, Y=${clickY}`);
+    for (let i = 0; i < towers.length; i++) {
+      const tower = towers[i];
+
+      const towerCenterX = tower.x + tower.width / 2;
+      const towerCenterY = tower.y + tower.height / 2;
+
+      const deltaX = Math.abs(towerCenterX - clickX);
+      const deltaY = Math.abs(towerCenterY - clickY);
+
+      if (deltaX <= refundRangeX && deltaY <= refundRangeY + toleranceY) {
+        sendEvent(5, { X: tower.x, Y: tower.y });
+
+        towers.splice(i, 1);
+        i--;
+
+        refunded = true;
+        userGold += towerCost;
+        break;
+      }
+    }
+    if (refunded) {
+      isRefundMode = false;
+    }
+  }
+});
 
 function placeBase() {
   const lastPoint = monsterPath[monsterPath.length - 1];
@@ -300,7 +347,6 @@ Promise.all([
     console.log('connection: ', data);
     userId = data.uuid;
     highScore = data.highScore;
-
     if (!isInitGame) {
       initGame();
     }
@@ -317,6 +363,7 @@ function startSpawning() {
   intervalId = setInterval(spawnMonster, monsterSpawnInterval);
 }
 
+// 타워 구매 버튼
 const buyTowerButton = document.createElement('button');
 buyTowerButton.textContent = '타워 구입';
 buyTowerButton.style.position = 'absolute';
@@ -330,13 +377,27 @@ buyTowerButton.addEventListener('click', placeNewTower);
 
 document.body.appendChild(buyTowerButton);
 
-function sendEvent(handlerId, payload) {
+// 타워 환불 버튼
+const refundTowerButton = document.createElement('button');
+refundTowerButton.textContent = '타워 환불';
+refundTowerButton.style.position = 'absolute';
+refundTowerButton.style.top = '10px';
+refundTowerButton.style.right = '130px';
+refundTowerButton.style.padding = '10px 20px';
+refundTowerButton.style.fontSize = '16px';
+refundTowerButton.style.cursor = 'pointer';
+
+refundTowerButton.addEventListener('click', toggleRefundMode);
+
+document.body.appendChild(refundTowerButton);
+
+const sendEvent = (handlerId, payload) => {
   serverSocket.emit('event', {
     userId,
     clientVersion: CLIENT_VERSION,
     handlerId,
     payload,
   });
-}
+};
 
 export { sendEvent };
