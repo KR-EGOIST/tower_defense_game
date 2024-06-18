@@ -347,23 +347,10 @@ Promise.all([
     console.log('connection: ', data);
     userId = data.uuid;
     highScore = data.highScore;
-
-    if (!userId) {
-      localStorage.setItem('userId', data.uuid);
-      userId = data.uuid;
+    if (!isInitGame) {
+      initGame();
     }
   });
-
-  /* 
-    서버의 이벤트들을 받는 코드들은 여기다가 쭉 작성해주시면 됩니다! 
-    e.g. serverSocket.on("...", () => {...});
-    이 때, 상태 동기화 이벤트의 경우에 아래의 코드를 마지막에 넣어주세요! 최초의 상태 동기화 이후에 게임을 초기화해야 하기 때문입니다! 
-
-    userId = data.uuid;
-*/
-  if (!isInitGame) {
-    initGame();
-  }
 });
 
 //몬스터의 스폰주기 설정
