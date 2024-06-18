@@ -227,8 +227,6 @@ canvas.addEventListener('click', (event) => {
         towers.splice(i, 1);
         i--;
 
-        refunded = true;
-
         //골드가 차감되기전에 서버의 골드와 검증한다.
         const targetGold = userGold + towerCost;
         sendEvent(6, { currentGold: userGold, targetGold });
@@ -243,6 +241,9 @@ canvas.addEventListener('click', (event) => {
           const upgrade = confirm('타워를 업그레이드 하시겠습니까?');
           if (upgrade) {
             if (userGold >= 100) {
+              const targetGold = userGold - 100;
+              sendEvent(6, { currentGold: userGold, targetGold });
+
               userGold -= 100;
               const towerLevel = tower.getTowerLevel();
               tower.setTowerLevel(towerLevel + 1);

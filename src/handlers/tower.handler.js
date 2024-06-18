@@ -33,6 +33,9 @@ export const towerAddOnHandler = (userId, payload) => {
 
   // 클라이언트의 타워 정보
   const gameTowers = payload.gameTowers;
+
+  console.log(currentTowers, gameTowers);
+
   // 클라이언트 타워 vs 서버 타워 비교
   const hasDifference = compareTowers(currentTowers, gameTowers);
   if (hasDifference) {
