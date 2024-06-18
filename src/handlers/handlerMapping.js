@@ -1,5 +1,11 @@
 import { monsterKillHandler } from './monster.handler.js';
-import { towerAddOnHandler, towerClearHandler, upgradeTower } from './tower.handler.js';
+import {
+  checkTowerLocation,
+  towerAddOnHandler,
+  towerClearHandler,
+  towerRemoveHandler,
+  upgradeTower,
+} from './tower.handler.js';
 import { gameStart, gameEnd } from './game.handler.js';
 
 const handlerMappings = {
@@ -9,6 +15,8 @@ const handlerMappings = {
   2: towerClearHandler,
   3: towerAddOnHandler,
   4: upgradeTower,
+  4: checkTowerLocation,
+  5: towerRemoveHandler,
   11: gameStart,
   12: gameEnd,
 };
