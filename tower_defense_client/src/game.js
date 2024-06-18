@@ -147,11 +147,13 @@ function placeInitialTowers() {
 
   for (let i = 0; i < numOfInitialTowers; i++) {
     const { x, y } = getRandomPositionNearPath(200);
+
+    //타워가 생성될 때, 좌표를 서버에 저장한다. 타워가 생성되기 전에 검증한다.
+    sendEvent(3, { X: x, Y: y, gameTowers: towers });
+
     const tower = new Tower(x, y, towerCost);
     towers.push(tower);
     tower.draw(ctx, towerImage);
-    //타워가 생성될 때, 좌표를 서버에 저장한다.
-    sendEvent(3, { X: x, Y: y });
   }
 }
 
@@ -162,10 +164,13 @@ function placeNewTower() {
   */
   if (userGold >= towerCost) {
     const { x, y } = getRandomPositionNearPath(200);
+
+    //타워가 생성될 때, 좌표를 서버에 저장한다. 타워가 생성되기 전에 검증한다.
+    sendEvent(3, { X: x, Y: y, gameTowers: towers });
+
     const tower = new Tower(x, y);
     towers.push(tower);
     tower.draw(ctx, towerImage);
-    sendEvent(3, { X: x, Y: y });
     userGold -= towerCost;
   } else {
     alert(`타워 구매비용은 ${towerCost}원 입니다`);
