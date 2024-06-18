@@ -1,9 +1,11 @@
-import { addTower, getTowers } from '../models/tower.model.js';
+import { addTower, getTowers, removeTower } from '../models/tower.model.js';
 import { clearTower } from '../models/tower.model.js';
 
 // 클라이언트 타워 vs 서버 타워 비교 함수
 function compareTowers(currentTowers, gameTowers) {
   //길이가 다르면 차이가 있음
+  console.log(currentTowers);
+  console.log(gameTowers);
   if (currentTowers.length !== gameTowers.length) {
     return true;
   }
@@ -14,7 +16,10 @@ function compareTowers(currentTowers, gameTowers) {
     const gameTowerPosition = gameTowers[i];
 
     //좌표를 비교
-    if (currentTower.tower.X !== gameTowerPosition.x || currentTower.tower.Y !== gameTowerPosition.y) {
+    if (
+      currentTower.tower.X !== gameTowerPosition.x ||
+      currentTower.tower.Y !== gameTowerPosition.y
+    ) {
       return true; //차이가 있음
     }
   }
@@ -67,4 +72,16 @@ export const checkTowerLocation = (userId, payload) => {
   });
 
   return { status: 'success' };
+};
+
+// 타워를 환불합니다.
+export const towerRemoveHandler = (userId, payload) => {
+  const { X, Y } = payload;
+  const result = removeTower(userId, X, Y);
+
+  if (result.status === 'success') {
+    return { status: 'success', message: result.message };
+  } else {
+    return { status: 'error', message: result.message };
+  }
 };
