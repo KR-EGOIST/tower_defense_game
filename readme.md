@@ -33,7 +33,7 @@
 
 ## 📄 프로젝트 도큐먼트
 
-### [API명세서]
+### [API명세서](https://industrious-lasagna-717.notion.site/Node-js-4-e71c9a7f34b8482aba410e823fe8c17a?pvs=4)
 
 ## 📄 패킷 구조
 
