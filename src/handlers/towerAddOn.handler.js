@@ -6,7 +6,7 @@ export const towerAddOnHandler = (userId, payload) => {
   let currentTowers = getTowers(userId);
 
   // 클라이언트 vs 서버 비교
-
+  
   addTower(userId, payload.X, payload.Y);
   return { status: 'success', message: `Tower Update: ${payload.X}, ${payload.Y}`};
 };
