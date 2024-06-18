@@ -261,7 +261,10 @@ function initGame() {
   isInitGame = true;
 }
 
-let userId = localStorage.getItem('userId');
+// 로그인 아이디를 로컬스토리지에서 가져온다.
+let id = localStorage.getItem('userId');
+// uuid를 저장할 userId 변수
+let userId = null;
 function getCookieValue(name) {
   const regex = new RegExp(`(^| )${name}=([^;]+)`);
   const match = document.cookie.match(regex);
@@ -281,7 +284,7 @@ Promise.all([
   serverSocket = io('http://localhost:8080', {
     query: {
       clientVersion: CLIENT_VERSION,
-      uuid: userId,
+      id: id,
       token: getCookieValue('authorization'),
     },
   });
@@ -292,8 +295,8 @@ Promise.all([
 
   serverSocket.on('connection', (data) => {
     console.log('connection: ', data);
+    // userId 가 없으면 userId 에 uuid 할당
     if (!userId) {
-      localStorage.setItem('userId', data.uuid);
       userId = data.uuid;
     }
   });

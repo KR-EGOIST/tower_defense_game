@@ -6,13 +6,16 @@ const users = [];
 // 서버 메모리에 유저의 세션(소켓ID)을 저장
 // 이때 유저는 객체 형태로 저장
 // { uuid: string; socketId: string; };
-export const addUser = async (user) => {
+export const addUser = (user) => {
   const data = {
     uuid: user.uuid,
     socketId: user.socketId,
   };
   users.push(data);
+};
 
+// 발급받은 uuid를 해당 유저 db 에 저장
+export const updateUser = async (user) => {
   const userData = await authMiddleware(user.token);
   const { userId } = userData;
   await prisma.users.update({
