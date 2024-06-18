@@ -1,86 +1,90 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="author" content="Changmin Kang" />
-  <title>내일배움캠프 Node.js 트랙 타워 디펜스 게임</title>
-  <link rel="icon" type="image/x-icon" href="/images/favicon.ico" />
-  <style>
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      background-color: #2d2d2d;
-      flex-direction: column;
-    }
-
-    #gameCanvas {
-      border: 2px solid #000;
-      display: none;
-    }
-
-    .button-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-    }
-
-    .button-container button {
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-  </style>
-</head>
-
-<body>
-  <div class="button-container">
-    <h1 style="color: white">내일배움캠프 Node.js 트랙 타워 디펜스 게임</h1>
-    <button id="registerButton">회원가입</button>
-    <button id="loginButton">로그인</button>
-    <button id="playButton">게임 플레이</button>
-  </div>
-  <canvas id="gameCanvas" width="1920" height="1080"></canvas>
-  <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
-  <script type="module">
-    // 저장된 토큰 가져오는 getCookieValue함수
-    function getCookieValue(name) {
-      const regex = new RegExp(`(^| )${name}=([^;]+)`)
-      const match = document.cookie.match(regex)
-      if (match) {
-        return match[2]
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="author" content="Changmin Kang" />
+    <title>내일배움캠프 Node.js 트랙 타워 디펜스 게임</title>
+    <link rel="icon" type="image/x-icon" href="/images/favicon.ico" />
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #2d2d2d;
+        flex-direction: column;
       }
-    }
 
-    document
-      .getElementById("registerButton")
-      .addEventListener("click", () => {
-        window.location.href = "register.html";
+      #gameCanvas {
+        border: 2px solid #000;
+        display: none;
+      }
+
+      .button-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .button-container button {
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="button-container">
+      <h1 style="color: white">내일배움캠프 Node.js 트랙 타워 디펜스 게임</h1>
+      <button id="registerButton">회원가입</button>
+      <button id="loginButton">로그인</button>
+      <button id="playButton">게임 플레이</button>
+    </div>
+    <canvas id="gameCanvas" width="1920" height="1080"></canvas>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script type="module">
+      // 저장된 토큰 가져오는 getCookieValue함수
+      function getCookieValue(name) {
+        const regex = new RegExp(`(^| )${name}=([^;]+)`);
+        const match = document.cookie.match(regex);
+        if (match) {
+          return match[2];
+        }
+      }
+
+      document.getElementById('registerButton').addEventListener('click', () => {
+        window.location.href = 'register.html';
       });
 
-    document.getElementById("loginButton").addEventListener("click", () => {
-      window.location.href = "login.html";
-    });
+      document.getElementById('loginButton').addEventListener('click', () => {
+        window.location.href = 'login.html';
+      });
 
-    document.getElementById("playButton").addEventListener("click", () => {
-      const authorization = getCookieValue('authorization');
+      document.getElementById('playButton').addEventListener('click', async () => {
+        const authorization = getCookieValue('authorization');
 
-      if (!authorization) {
-        alert('로그인을 해주세요!');
-        window.location.href = "login.html";
-        return;
-      }
+        if (!authorization) {
+          alert('로그인을 해주세요!');
+          window.location.href = 'login.html';
+          return;
+        }
 
-      document.querySelector(".button-container").style.display = "none";
-      document.getElementById("gameCanvas").style.display = "block";
-      import("./src/game.js");
-    });
-  </script>
-</body>
+        document.querySelector('.button-container').style.display = 'none';
+        document.getElementById('gameCanvas').style.display = 'block';
+        const module = await import('./src/game.js');
 
+        function handleClick(event) {
+          console.log(event.clientX + ', ' + event.clientY);
+          module.sendEvent(4, { X: event.clientX, Y: event.clientY });
+        }
+
+        const clickArea = document.getElementById('gameCanvas');
+        clickArea.addEventListener('click', handleClick);
+      });
+    </script>
+  </body>
 </html>
