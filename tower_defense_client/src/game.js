@@ -176,8 +176,6 @@ function placeNewTower() {
     towers.push(tower);
     tower.draw(ctx, towerImage);
     console.log(`타워 위치: X=${tower.x}, Y=${tower.y}`);
-    // add tower
-    sendEvent(3, { X: x, Y: y });
     userGold -= towerCost;
   } else {
     alert(`타워 구매비용은 ${towerCost}원 입니다`);
@@ -190,7 +188,7 @@ function toggleRefundMode() {
   alert(isRefundMode ? '타워 환불 모드 활성화' : '타워 환불 모드 비활성화');
 }
 
-// 타워 클릭 이벤트
+//타워 클릭 이벤트
 canvas.addEventListener('click', (event) => {
   if (isRefundMode) {
     const rect = canvas.getBoundingClientRect();
@@ -211,12 +209,13 @@ canvas.addEventListener('click', (event) => {
       const deltaY = Math.abs(towerCenterY - clickY);
 
       if (deltaX <= refundRangeX && deltaY <= refundRangeY + toleranceY) {
-        sendEvent(4, { X: tower.x, Y: tower.y });
+        sendEvent(5, { X: tower.x, Y: tower.y });
 
         towers.splice(i, 1);
         i--;
 
         refunded = true;
+        userGold += towerCost;
         break;
       }
     }
@@ -352,16 +351,6 @@ Promise.all([
     if (!userId) {
       localStorage.setItem('userId', data.uuid);
       userId = data.uuid;
-    }
-  });
-
-  serverSocket.on('response', (data) => {
-    if (data.status === 'success' && data.goldRefunded) {
-      userGold += data.goldRefunded;
-      console.log(`타워 환불 완료: ${data.goldRefunded} 골드가 반환되었습니다.`);
-      updateUI(); // 골드 정보 업데이트
-    } else {
-      console.error(data.message); // 오류 메시지 콘솔에 출력
     }
   });
 
