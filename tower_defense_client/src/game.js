@@ -144,6 +144,11 @@ function getRandomPositionNearPath(maxDistance) {
   };
 }
 
+//골드 정보 초기화. 유저는 0원을 가진다.
+function InitialGolds() {
+  sendEvent(7);
+}
+
 function placeInitialTowers() {
   sendEvent(2); //게임이 시작될 때 타워를 비우기
 
@@ -176,6 +181,11 @@ function placeNewTower() {
     towers.push(tower);
     tower.draw(ctx, towerImage);
     console.log(`타워 위치: X=${tower.x}, Y=${tower.y}`);
+
+    //골드가 차감되기전에 서버의 골드와 검증한다.
+    const targetGold = userGold - towerCost;
+    sendEvent(6, { currentGold: userGold, targetGold });
+
     userGold -= towerCost;
   } else {
     alert(`타워 구매비용은 ${towerCost}원 입니다`);
@@ -215,6 +225,11 @@ canvas.addEventListener('click', (event) => {
         i--;
 
         refunded = true;
+
+        //골드가 차감되기전에 서버의 골드와 검증한다.
+        const targetGold = userGold + towerCost;
+        sendEvent(6, { currentGold: userGold, targetGold });
+
         userGold += towerCost;
         break;
       }
@@ -287,6 +302,10 @@ function gameLoop() {
       if (score % 2000 === 0) {
         monsterLevel += 1;
 
+        //골드가 차감되기전에 서버의 골드와 검증한다.
+        const targetGold = userGold + 1000;
+        sendEvent(6, { currentGold: userGold, targetGold });
+
         userGold += 1000;
         //setInterval(spawnMonster, monsterSpawnInterval);
         if (monsterSpawnInterval !== 1000) {
@@ -307,6 +326,7 @@ function initGame() {
   sendEvent(11, {});
   monsterPath = generateRandomMonsterPath(); // 몬스터 경로 생성
   initMap(); // 맵 초기화 (배경, 몬스터 경로 그리기)
+  InitialGolds(); // 골드 초기화
   placeInitialTowers(); // 설정된 초기 타워 개수만큼 사전에 타워 배치
   placeBase(); // 기지 배치
 
