@@ -1,4 +1,4 @@
-import { addTower, getTowers, removeTower } from '../models/tower.model.js';
+import { addTower, getTowerIndex, getTowers, removeTower } from '../models/tower.model.js';
 import { clearTower } from '../models/tower.model.js';
 
 // 클라이언트 타워 vs 서버 타워 비교 함수
@@ -42,7 +42,7 @@ export const towerAddOnHandler = (userId, payload) => {
     };
   }
 
-  addTower(userId, payload.X, payload.Y);
+  addTower(userId, payload.X, payload.Y, payload.level);
   return { status: 'success', message: `Tower Update: ${payload.X}, ${payload.Y}` };
 };
 
@@ -52,16 +52,29 @@ export const towerClearHandler = () => {
   return { status: 'success', message: 'Tower Clear' };
 };
 
-export const upgradeTower = (userId, payload) => {};
+export const upgradeTower = (userId, payload) => {
+  const towers = getTowers(userId);
+  const index = getTowerIndex(userId, payload.X, payload.Y);
+
+  if (index === -1) {
+    return { status: 'fail', message: 'Tower not found' };
+  }
+
+  towers[index].level = payload.level;
+
+  return { status: 'success', message: 'Tower upgrade successfully' };
+};
 
 // 타워를 환불합니다.
 export const towerRemoveHandler = (userId, payload) => {
   const { X, Y } = payload;
-  const result = removeTower(userId, X, Y);
+  const index = getTowerIndex(userId, X, Y);
 
-  if (result.status === 'success') {
-    return { status: 'success', message: result.message };
-  } else {
-    return { status: 'error', message: result.message };
+  if (index === -1) {
+    return { status: 'fail', message: 'Tower not found' };
   }
+
+  removeTower(index);
+
+  return { status: 'success', message: 'Tower removed successfully' };
 };
