@@ -6,6 +6,7 @@ import {
   towerRemoveHandler,
 } from './tower.handler.js';
 import { gameStart, gameEnd } from './game.handler.js';
+import { InitGoldHandler, goldChangeHandler } from './gold.handler.js';
 
 const handlerMappings = {
   // 1: 함수 이름,
@@ -15,6 +16,8 @@ const handlerMappings = {
   3: towerAddOnHandler,
   4: checkTowerLocation,
   5: towerRemoveHandler,
+  6: goldChangeHandler,
+  7: InitGoldHandler,
   11: gameStart,
   12: gameEnd,
 };
