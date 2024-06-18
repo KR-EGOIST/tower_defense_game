@@ -21,6 +21,8 @@ let baseHp = 50; // 기지 체력
 
 let towerCost = 600; // 타워 구입 비용
 let numOfInitialTowers = 3; // 초기 타워 개수
+let towerMaxLevel = 3; // 타워 최대 레벨
+
 let monsterLevel = 0; // 몬스터 레벨
 let monsterSpawnInterval = 5000; // 몬스터 생성 주기
 let intervalId = null;
@@ -151,7 +153,7 @@ function placeInitialTowers() {
     const { x, y } = getRandomPositionNearPath(200);
 
     //타워가 생성될 때, 좌표를 서버에 저장한다. 타워가 생성되기 전에 검증한다.
-    sendEvent(3, { X: x, Y: y, gameTowers: towers });
+    sendEvent(3, { X: x, Y: y, gameTowers: towers, level: 0 });
 
     const tower = new Tower(x, y, towerCost);
     towers.push(tower);
@@ -170,7 +172,7 @@ function placeNewTower() {
     const { x, y } = getRandomPositionNearPath(200);
 
     //타워가 생성될 때, 좌표를 서버에 저장한다. 타워가 생성되기 전에 검증한다.
-    sendEvent(3, { X: x, Y: y, gameTowers: towers });
+    sendEvent(3, { X: x, Y: y, gameTowers: towers, level: 0 });
 
     const tower = new Tower(x, y);
     towers.push(tower);
@@ -190,37 +192,53 @@ function toggleRefundMode() {
 
 //타워 클릭 이벤트
 canvas.addEventListener('click', (event) => {
-  if (isRefundMode) {
-    const rect = canvas.getBoundingClientRect();
-    const clickX = event.clientX - rect.left;
-    const clickY = event.clientY - rect.top;
-    const refundRangeX = 35;
-    const refundRangeY = 75;
-    const toleranceY = 10;
-    let refunded = false;
-    console.log(`마우스 클릭 위치: X=${clickX}, Y=${clickY}`);
-    for (let i = 0; i < towers.length; i++) {
-      const tower = towers[i];
+  const rect = canvas.getBoundingClientRect();
+  const clickX = event.clientX - rect.left;
+  const clickY = event.clientY - rect.top;
+  const refundRangeX = 35;
+  const refundRangeY = 75;
+  const toleranceY = 10;
 
-      const towerCenterX = tower.x + tower.width / 2;
-      const towerCenterY = tower.y + tower.height / 2;
+  for (let i = 0; i < towers.length; i++) {
+    const tower = towers[i];
 
-      const deltaX = Math.abs(towerCenterX - clickX);
-      const deltaY = Math.abs(towerCenterY - clickY);
+    const towerCenterX = tower.x + tower.width / 2;
+    const towerCenterY = tower.y + tower.height / 2;
 
-      if (deltaX <= refundRangeX && deltaY <= refundRangeY + toleranceY) {
+    const deltaX = Math.abs(towerCenterX - clickX);
+    const deltaY = Math.abs(towerCenterY - clickY);
+
+    if (deltaX <= refundRangeX && deltaY <= refundRangeY + toleranceY) {
+      // 타워가 있는 곳을 클릭했다면
+      if (isRefundMode) {
+        // 환불 모드일 때
         sendEvent(5, { X: tower.x, Y: tower.y });
 
         towers.splice(i, 1);
         i--;
 
-        refunded = true;
         userGold += towerCost;
+        isRefundMode = false;
         break;
+      } else {
+        // 환불모드가 아닐 때 업그레이드 창 띄우기
+        if (tower.getTowerLevel() < towerMaxLevel) {
+          // 타워 레벨이 최고 레벨이 아니면
+          const upgrade = confirm('타워를 업그레이드 하시겠습니까?');
+          if (upgrade) {
+            if (userGold >= 100) {
+              userGold -= 100;
+              const towerLevel = tower.getTowerLevel();
+              tower.setTowerLevel(towerLevel + 1);
+              sendEvent(4, { X: tower.x, Y: tower.y, level: towerLevel + 1 });
+            } else {
+              alert(`타워 업그레이드 비용은 100Gold 입니다`);
+            }
+          }
+        } else {
+          alert('타워가 최고 레벨입니다.');
+        }
       }
-    }
-    if (refunded) {
-      isRefundMode = false;
     }
   }
 });
@@ -391,14 +409,14 @@ refundTowerButton.addEventListener('click', toggleRefundMode);
 
 document.body.appendChild(refundTowerButton);
 
-const sendEvent = (handlerId, payload) => {
+function sendEvent(handlerId, payload) {
   serverSocket.emit('event', {
     userId,
     clientVersion: CLIENT_VERSION,
     handlerId,
     payload,
   });
-};
+}
 
 function getUserGold() {
   return userGold;
@@ -408,4 +426,4 @@ function setUserGold(gold) {
   userGold = gold;
 }
 
-export { sendEvent, getUserGold, setUserGold };
+export { getUserGold, setUserGold };

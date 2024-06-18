@@ -75,7 +75,7 @@
         addAudio();
         document.querySelector('.button-container').style.display = 'none';
         document.getElementById('gameCanvas').style.display = 'block';
-        const module = await import('./src/game.js');
+        import('./src/game.js');
       });
 
       function addAudio() {
