@@ -17,6 +17,7 @@ function compareTowers(currentTowers, gameTowers) {
       return true; //차이가 있음
     }
   }
+  
 
   return false; //차이가 없음
 }
