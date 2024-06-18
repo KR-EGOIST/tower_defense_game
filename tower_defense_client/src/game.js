@@ -224,6 +224,7 @@ function gameLoop() {
     if (monster.hp > 0) {
       const isDestroyed = monster.move(base);
       if (isDestroyed) {
+        sendEvent(12,{});
         /* 게임 오버 */
         alert('게임 오버. 스파르타 본부를 지키지 못했다...ㅠㅠ');
         location.reload();
@@ -255,7 +256,7 @@ function initGame() {
   if (isInitGame) {
     return;
   }
-
+sendEvent(11,{});
   monsterPath = generateRandomMonsterPath(); // 몬스터 경로 생성
   initMap(); // 맵 초기화 (배경, 몬스터 경로 그리기)
   placeInitialTowers(); // 설정된 초기 타워 개수만큼 사전에 타워 배치
