@@ -11,10 +11,10 @@ function compareTowers(currentTowers, gameTowers) {
   // currentTower와 gameTower의 각 요소를 순회하며 비교
   for (let i = 0; i < currentTowers.length; i++) {
     const currentTower = currentTowers[i];
-    const gameTower = gameTowers[i];
+    const gameTowerPosition = gameTowers[i];
 
     //좌표를 비교
-    if (currentTower.tower.X !== gameTower.tower.X || currentTower.tower.Y !== gameTower.tower.Y) {
+    if (currentTower.tower.X !== gameTowerPosition.x || currentTower.tower.Y !== gameTowerPosition.y) {
       return true; //차이가 있음
     }
   }
