@@ -32,6 +32,7 @@ const towers = [];
 let score = 0; // 게임 점수
 let highScore = 0; // 기존 최고 점수
 let isInitGame = false;
+let isPlay = true;
 let isRefundMode = false; // 타워 환불 모드(기본off)
 
 // 이미지 로딩 파트
@@ -147,8 +148,6 @@ function getRandomPositionNearPath(maxDistance) {
 }
 
 function placeInitialTowers() {
-  sendEvent(2); //게임이 시작될 때 타워를 비우기
-
   for (let i = 0; i < numOfInitialTowers; i++) {
     const { x, y } = getRandomPositionNearPath(200);
 
@@ -287,16 +286,24 @@ function gameLoop() {
     if (monster.hp > 0) {
       const isDestroyed = monster.move(base);
       if (isDestroyed) {
-        sendEvent(12, { score: score, token: getCookieValue('authorization') });
         /* 게임 오버 */
-        alert('게임 오버. 스파르타 본부를 지키지 못했다...ㅠㅠ');
-        location.reload();
+        sendEvent(12, { score: score, token: getCookieValue('authorization') });
+        isPlay = false;
+        requestAnimationFrame(gameLoop);
+
+        setTimeout(function () {
+          alert('게임 오버. 스파르타 본부를 지키지 못했다...ㅠㅠ');
+          location.reload();
+        }, 1000);
       }
       monster.draw(ctx);
-    } else {
-      /* 몬스터가 죽었을 때 */
+    } else if (monster.hp === -1000) {
+      // 몬스터가 기지를 공격한 후
       monsters.splice(i, 1);
-      sendEvent(21, {});
+    } else {
+      /* 몬스터가 타워에 죽었을 때 */
+      monsters.splice(i, 1);
+      sendEvent(21, { monsterId: monster.getMonsterId() });
       score += 2000;
 
       if (score % 2000 === 0) {
@@ -313,7 +320,9 @@ function gameLoop() {
     }
   }
 
-  requestAnimationFrame(gameLoop); // 지속적으로 다음 프레임에 gameLoop 함수 호출할 수 있도록 함
+  if (isPlay) {
+    requestAnimationFrame(gameLoop); // 지속적으로 다음 프레임에 gameLoop 함수 호출할 수 있도록 함
+  }
 }
 
 function initGame() {

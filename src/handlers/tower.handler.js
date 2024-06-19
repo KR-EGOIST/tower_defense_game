@@ -64,12 +64,6 @@ export const towerAddOnHandler = (userId, payload) => {
   };
 };
 
-//서버에 저장된 타워들을 전부 삭제한다.
-export const towerClearHandler = (userId, payload) => {
-  clearTower();
-  return { status: 'success', message: 'Tower Clear' };
-};
-
 export const upgradeTowerHandler = (userId, payload) => {
   const towers = getTowers(userId);
   const index = getTowerIndex(userId, payload.X, payload.Y);
