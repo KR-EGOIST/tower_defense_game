@@ -1,6 +1,7 @@
+import { updateUserGoldHandler } from './goldHandler.js';
+
 const handlerMappings = {
-  // 1: 함수 이름,
-  // 이런 식으로 사용하시면 됩니다.
+  5: updateUserGoldHandler,
 };
 
 export default handlerMappings;

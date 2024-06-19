@@ -3,8 +3,8 @@ const golds = []; //모든 유저의 골드
 
 // 골드 초기화
 export const InitGold = (userId) => {
-    golds.length = 0;
-    setGold(userId, 0);
+  golds.length = 0;
+  setGold(userId, 0);
 };
 
 //유저 정보와 현재 골드를 저장한다
@@ -23,5 +23,11 @@ export const setGold = (userId, gold) => {
 
 //해당하는 유저의 골드를 반환한다
 export const getGold = (userId) => {
-  return golds.filter((gold) => gold.userId === userId);
+  const userIndex = golds.findIndex((user) => user.userId === userId);
+
+  if (userIndex === -1) {
+    return;
+  }
+
+  return golds[userIndex].gold;
 };

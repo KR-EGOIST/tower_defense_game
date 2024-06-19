@@ -1,7 +1,9 @@
+import { InitGold } from '../models/gold.model.js';
 import { setScore, getScore } from '../models/score.model.js';
 
 // 게임 시작 시 작동하는 핸들러
 export const gameStart = (uuid, payload) => {
+  InitGold(uuid);
   return { status: 'success', handler: '11' };
 };
 
