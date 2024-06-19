@@ -1,13 +1,13 @@
-import { InitGold } from '../models/gold.model.js';
+import { addUserGold } from '../models/gold.model.js';
 import { clearMonsters, getMonsters } from '../models/monster.model.js';
+import { clearTowers } from '../models/tower.model.js';
 import { setScore, getScore } from '../models/score.model.js';
-import { clearTower } from '../models/tower.model.js';
 
 // 게임 시작 시 작동하는 핸들러
 export const gameStart = (uuid, payload) => {
-  InitGold(uuid);
+  clearTowers(uuid);
   clearMonsters(uuid);
-  clearTower();
+  addUserGold(uuid);
   return { status: 'success', message: 'Game Start' };
 };
 
@@ -21,7 +21,7 @@ export const gameEnd = async (uuid, payload) => {
 
   let verificationScore = 0;
   for (let i = 0; i < userMonsters.length; i++) {
-    verificationScore += 2000;
+    verificationScore += (userMonsters[i].level + 1) * 100;
   }
   if (verificationScore !== payload.score) {
     return { status: 'fail', message: 'Score verification failed' };
