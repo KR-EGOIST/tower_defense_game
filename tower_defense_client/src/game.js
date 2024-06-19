@@ -314,8 +314,13 @@ function gameLoop() {
     } else {
       /* 몬스터가 타워에 죽었을 때 */
       monsters.splice(i, 1);
-      sendEvent(21, { monsterId: monster.getMonsterId() });
-      score += 2000;
+
+      if (monster.getMonsterId() === 5) {
+        sendEvent(6, { gold: 500 });
+      } else {
+        score += 2000;
+        sendEvent(21, { monsterId: monster.getMonsterId() });
+      }
 
       if (score % 2000 === 0) {
         monsterLevel += 1;
