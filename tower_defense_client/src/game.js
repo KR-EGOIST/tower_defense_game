@@ -56,6 +56,39 @@ for (let i = 1; i <= NUM_OF_MONSTERS; i++) {
 
 let monsterPath;
 
+// 메시지 표시함수(2초 동안 보여주고 없애주기)
+function showMessage(message, duration = 2000) {
+  let messageElement = document.getElementById('message');
+  let messageTimer; // 메시지 타이머 초기화 함수
+  if (!messageElement) {
+    messageElement = document.createElement('div');
+    messageElement.id = 'message';
+    messageElement.style.position = 'absolute';
+    messageElement.style.top = '20px';
+    messageElement.style.left = '50%';
+    messageElement.style.transform = 'translateX(-50%)';
+    messageElement.style.padding = '10px';
+    messageElement.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+    messageElement.style.color = 'white';
+    messageElement.style.fontSize = '16px';
+    document.body.appendChild(messageElement);
+  }
+
+  // 메시지를 표시
+  messageElement.innerText = message;
+  messageElement.style.display = 'block';
+
+  // 이전 타이머가 있다면 초기화
+  if (messageTimer) {
+    clearTimeout(messageTimer);
+  }
+
+  // 일정 시간 후에 메시지 숨기기
+  messageTimer = setTimeout(() => {
+    messageElement.style.display = 'none';
+  }, duration);
+}
+
 function generateRandomMonsterPath() {
   const path = [];
   let currentX = 0;
@@ -190,14 +223,16 @@ function placeNewTower() {
 
     userGold -= towerCost;
   } else {
-    alert(`타워 구매비용은 ${towerCost}원 입니다`);
+    showMessage(`금액이 부족합니다. 필요 금액: ${towerCost}원`);
   }
 }
 
 // 타워 환불 모드
 function toggleRefundMode() {
   isRefundMode = !isRefundMode;
-  alert(isRefundMode ? '타워 환불 모드 활성화' : '타워 환불 모드 비활성화');
+  showMessage(
+    isRefundMode ? `※ 주의 ※ 환불하고 싶은 타워를 선택하세요.` : `타워 환불 모드 비활성화`,
+  );
 }
 
 //타워 클릭 이벤트
@@ -207,7 +242,6 @@ canvas.addEventListener('click', (event) => {
   const clickY = event.clientY - rect.top;
   const refundRangeX = 35;
   const refundRangeY = 75;
-  const toleranceY = 10;
 
   for (let i = 0; i < towers.length; i++) {
     const tower = towers[i];
@@ -218,7 +252,7 @@ canvas.addEventListener('click', (event) => {
     const deltaX = Math.abs(towerCenterX - clickX);
     const deltaY = Math.abs(towerCenterY - clickY);
 
-    if (deltaX <= refundRangeX && deltaY <= refundRangeY + toleranceY) {
+    if (deltaX <= refundRangeX && deltaY <= refundRangeY) {
       // 타워가 있는 곳을 클릭했다면
       if (isRefundMode) {
         // 환불 모드일 때
@@ -249,11 +283,11 @@ canvas.addEventListener('click', (event) => {
               tower.setTowerLevel(towerLevel + 1);
               sendEvent(4, { X: tower.x, Y: tower.y, level: towerLevel + 1 });
             } else {
-              alert(`타워 업그레이드 비용은 100Gold 입니다`);
+              showMessage(`타워 업그레이드 비용은 100Gold 입니다`);
             }
           }
         } else {
-          alert('타워가 최고 레벨입니다.');
+          showMessage('타워가 최고 레벨입니다.');
         }
       }
     }
