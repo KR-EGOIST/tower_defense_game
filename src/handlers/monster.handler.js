@@ -1,7 +1,12 @@
-import { setMonster } from '../models/monster.model.js';
+import { getMonsters, setMonster } from '../models/monster.model.js';
 
 // 몬스터 kill 시 작동하는 핸들러
 export const monsterKillHandler = (uuid, payload) => {
-  //setMonster();
-  return { status: 'success' };
+  const monsters = getMonsters(uuid);
+  if (!monsters) {
+    return { status: 'fail', message: 'Monsters not found' };
+  }
+
+  setMonster(uuid, payload.monsterId);
+  return { status: 'success', message: 'Monster is dead' };
 };
