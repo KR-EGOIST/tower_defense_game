@@ -146,11 +146,6 @@ function getRandomPositionNearPath(maxDistance) {
   };
 }
 
-//골드 정보 초기화. 유저는 0원을 가진다.
-function InitialGolds() {
-  sendEvent(7);
-}
-
 function placeInitialTowers() {
   sendEvent(2); //게임이 시작될 때 타워를 비우기
 
@@ -158,7 +153,7 @@ function placeInitialTowers() {
     const { x, y } = getRandomPositionNearPath(200);
 
     //타워가 생성될 때, 좌표를 서버에 저장한다. 타워가 생성되기 전에 검증한다.
-    sendEvent(3, { X: x, Y: y, gameTowers: towers, level: 0 });
+    sendEvent(3, { X: x, Y: y, gameTowers: towers, level: 0, gold: 0 });
 
     const tower = new Tower(x, y, towerCost);
     towers.push(tower);
@@ -177,18 +172,12 @@ function placeNewTower() {
     const { x, y } = getRandomPositionNearPath(200);
 
     //타워가 생성될 때, 좌표를 서버에 저장한다. 타워가 생성되기 전에 검증한다.
-    sendEvent(3, { X: x, Y: y, gameTowers: towers, level: 0 });
+    sendEvent(3, { X: x, Y: y, gameTowers: towers, level: 0, gold: -towerCost });
 
     const tower = new Tower(x, y);
     towers.push(tower);
     tower.draw(ctx, towerImage);
     console.log(`타워 위치: X=${tower.x}, Y=${tower.y}`);
-
-    //골드가 차감되기전에 서버의 골드와 검증한다.
-    const targetGold = userGold - towerCost;
-    sendEvent(6, { currentGold: userGold, targetGold });
-
-    userGold -= towerCost;
   } else {
     alert(`타워 구매비용은 ${towerCost}원 입니다`);
   }
@@ -222,16 +211,11 @@ canvas.addEventListener('click', (event) => {
       // 타워가 있는 곳을 클릭했다면
       if (isRefundMode) {
         // 환불 모드일 때
-        sendEvent(5, { X: tower.x, Y: tower.y });
+        sendEvent(5, { X: tower.x, Y: tower.y, gold: towerCost });
 
         towers.splice(i, 1);
         i--;
 
-        //골드가 차감되기전에 서버의 골드와 검증한다.
-        const targetGold = userGold + towerCost;
-        sendEvent(6, { currentGold: userGold, targetGold });
-
-        userGold += towerCost;
         isRefundMode = false;
         break;
       } else {
@@ -241,13 +225,9 @@ canvas.addEventListener('click', (event) => {
           const upgrade = confirm('타워를 업그레이드 하시겠습니까?');
           if (upgrade) {
             if (userGold >= 100) {
-              const targetGold = userGold - 100;
-              sendEvent(6, { currentGold: userGold, targetGold });
-
-              userGold -= 100;
               const towerLevel = tower.getTowerLevel();
               tower.setTowerLevel(towerLevel + 1);
-              sendEvent(4, { X: tower.x, Y: tower.y, level: towerLevel + 1 });
+              sendEvent(4, { X: tower.x, Y: tower.y, level: towerLevel + 1, gold: -100 });
             } else {
               alert(`타워 업그레이드 비용은 100Gold 입니다`);
             }
@@ -322,11 +302,8 @@ function gameLoop() {
       if (score % 2000 === 0) {
         monsterLevel += 1;
 
-        //골드가 차감되기전에 서버의 골드와 검증한다.
-        const targetGold = userGold + 1000;
-        sendEvent(6, { currentGold: userGold, targetGold });
+        sendEvent(6, { gold: 1000 });
 
-        userGold += 1000;
         //setInterval(spawnMonster, monsterSpawnInterval);
         if (monsterSpawnInterval !== 1000) {
           monsterSpawnInterval -= 500;
@@ -346,7 +323,6 @@ function initGame() {
   sendEvent(11, {});
   monsterPath = generateRandomMonsterPath(); // 몬스터 경로 생성
   initMap(); // 맵 초기화 (배경, 몬스터 경로 그리기)
-  InitialGolds(); // 골드 초기화
   placeInitialTowers(); // 설정된 초기 타워 개수만큼 사전에 타워 배치
   placeBase(); // 기지 배치
 
