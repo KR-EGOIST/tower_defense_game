@@ -39,7 +39,7 @@
 <img src="https://img.shields.io/badge/mysql-4479A1?style=for-the-badge&logo=mysql&logoColor=white">
 <img src="https://img.shields.io/badge/prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white">
 
-## 📄 프로젝트 도큐먼트
+## 📄 API 명세서
 
 ### [API명세서](https://industrious-lasagna-717.notion.site/Node-js-4-e71c9a7f34b8482aba410e823fe8c17a?pvs=4)
 
