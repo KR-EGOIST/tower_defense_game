@@ -17,7 +17,7 @@ export const goldChangeHandler = (userId, payload) => {
 
   return {
     status: 'success',
-    message: `Gold Update: ${payload.targetGold}`,
+    message: `Gold Update: ${payload.gold}`,
     handlerId: 5,
     gold: userGold,
   };
