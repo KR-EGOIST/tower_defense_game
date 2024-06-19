@@ -21,7 +21,7 @@ export const gameEnd = async (uuid, payload) => {
 
   let verificationScore = 0;
   for (let i = 0; i < userMonsters.length; i++) {
-    verificationScore += 100;
+    verificationScore += 2000;
   }
   if (verificationScore !== payload.score) {
     return { status: 'fail', message: 'Score verification failed' };
