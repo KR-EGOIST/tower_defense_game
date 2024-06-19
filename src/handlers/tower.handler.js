@@ -1,6 +1,5 @@
 import { getGold, setGold } from '../models/gold.model.js';
 import { addTower, getTowerIndex, getTowers, removeTower } from '../models/tower.model.js';
-import { clearTower } from '../models/tower.model.js';
 
 // 클라이언트 타워 vs 서버 타워 비교 함수
 function compareTowers(currentTowers, gameTowers) {

@@ -1,11 +1,6 @@
 const towers = []; //모든 유저의 타워 목록
 //tower = {userId: 유저아이디, tower: {x좌표, y좌표}}
 
-//전체 타워 삭제
-export const clearTower = () => {
-  towers.length = 0;
-};
-
 //유저 정보와 타워의 좌표를 저장한다
 export const addTower = (userId, coordinateX, coordinateY, level) => {
   towers.push({ userId, tower: { X: coordinateX, Y: coordinateY }, level: level });
@@ -18,10 +13,11 @@ export const getTowers = (userId) => {
 
 export const getTowerIndex = (userId, coordinateX, coordinateY) => {
   const index = towers.findIndex(
-    (tower) =>
-      tower.userId === userId && tower.tower.X === coordinateX && tower.tower.Y === coordinateY,
+    (element) =>
+      element.userId === userId &&
+      element.tower.X === coordinateX &&
+      element.tower.Y === coordinateY,
   );
-
   return index;
 };
 

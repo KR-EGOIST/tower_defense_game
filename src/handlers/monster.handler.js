@@ -7,6 +7,6 @@ export const monsterKillHandler = (uuid, payload) => {
     return { status: 'fail', message: 'Monsters not found' };
   }
 
-  setMonster(uuid, payload.monsterId);
+  setMonster(uuid, payload.monsterId, payload.monsterLevel);
   return { status: 'success', message: 'Monster is dead' };
 };

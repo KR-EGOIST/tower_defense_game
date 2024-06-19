@@ -25,6 +25,8 @@ let numOfInitialTowers = 3; // 초기 타워 개수
 let towerMaxLevel = 3; // 타워 최대 레벨
 
 let monsterLevel = 0; // 몬스터 레벨
+let killScore = 100; // 몬스터 잡을 시 획득 점수
+let killCount = 0; // 몬스터 잡은 횟수
 let monsterSpawnInterval = 5000; // 몬스터 생성 주기
 let intervalId = null;
 let goldGoblinintervalId = null;
@@ -36,6 +38,7 @@ let highScore = 0; // 기존 최고 점수
 let isInitGame = false;
 let isPlay = true;
 let isRefundMode = false; // 타워 환불 모드(기본off)
+let isBuyMode = false; // 타워 구입 모드(기본off)
 
 // 이미지 로딩 파트
 const backgroundImage = new Image();
@@ -201,24 +204,12 @@ function placeInitialTowers() {
 
 // 타워 구입
 function placeNewTower() {
-  /* 
-    타워를 구입할 수 있는 자원이 있을 때 타워 구입 후 랜덤 배치하면 됩니다.
-    빠진 코드들을 채워넣어주세요! 
-  */
-  // 유저가 가진 골드가 타워 금액(600원)보다 크거나 같다면 유저골드 차감 후 타워구매
-  if (userGold >= towerCost) {
-    const { x, y } = getRandomPositionNearPath(200);
+  isBuyMode = !isBuyMode;
+  showMessage(
+    isBuyMode ? `※ 주의 ※ 타워를 생성할 위치를 클릭해주세요.` : `타워 구매 모드 비활성화`,
+  );
 
-    //타워가 생성될 때, 좌표를 서버에 저장한다. 타워가 생성되기 전에 검증한다.
-    sendEvent(3, { X: x, Y: y, gameTowers: towers, level: 0, gold: -towerCost });
-
-    const tower = new Tower(x, y, towerCost, towerImages[0]);
-    towers.push(tower);
-    tower.draw(ctx);
-    console.log(`타워 위치: X=${tower.x}, Y=${tower.y}`);
-  } else {
-    showMessage(`금액이 부족합니다. 필요 금액: ${towerCost}원`);
-  }
+  isBuyMode ? (refundTowerButton.disabled = true) : (refundTowerButton.disabled = false);
 }
 
 // 타워 환불 모드
@@ -227,6 +218,8 @@ function toggleRefundMode() {
   showMessage(
     isRefundMode ? `※ 주의 ※ 환불하고 싶은 타워를 선택하세요.` : `타워 환불 모드 비활성화`,
   );
+
+  isRefundMode ? (buyTowerButton.disabled = true) : (buyTowerButton.disabled = false);
 }
 
 //타워 클릭 이벤트
@@ -250,25 +243,29 @@ canvas.addEventListener('click', (event) => {
       // 타워가 있는 곳을 클릭했다면
       if (isRefundMode) {
         // 환불 모드일 때
-        sendEvent(5, { X: tower.x, Y: tower.y, gold: towerCost });
+        const towerLevel = tower.getTowerLevel();
+        const refundGold = (towerLevel + 1) * towerCost * 0.7;
+        sendEvent(5, { X: tower.x, Y: tower.y, gold: refundGold });
 
         towers.splice(i, 1);
         i--;
 
         isRefundMode = false;
+        isRefundMode ? (buyTowerButton.disabled = true) : (buyTowerButton.disabled = false);
         break;
       } else {
         // 환불모드가 아닐 때 업그레이드 창 띄우기
         if (tower.getTowerLevel() < towerMaxLevel) {
+          const towerLevel = tower.getTowerLevel();
           // 타워 레벨이 최고 레벨이 아니면
-          const upgrade = confirm('타워를 업그레이드 하시겠습니까?');
+          const upgrade = confirm(`현재 레벨 ${towerLevel} 타워를 업그레이드 하시겠습니까?`);
           if (upgrade) {
-            if (userGold >= 100) {
-              const towerLevel = tower.getTowerLevel();
+            const upgradeGold = (towerLevel + 1) * towerCost;
+            if (userGold >= upgradeGold) {
               tower.setTowerLevel(towerLevel + 1, towerImages[towerLevel + 1]);
-              sendEvent(4, { X: tower.x, Y: tower.y, level: towerLevel + 1, gold: -100 });
+              sendEvent(4, { X: tower.x, Y: tower.y, level: towerLevel + 1, gold: -upgradeGold });
             } else {
-              showMessage(`타워 업그레이드 비용은 100Gold 입니다`);
+              showMessage(`타워 업그레이드 비용은 ${upgradeGold}Gold 입니다`);
             }
           }
         } else {
@@ -276,6 +273,23 @@ canvas.addEventListener('click', (event) => {
         }
       }
     }
+  }
+
+  if (isBuyMode) {
+    if (userGold >= towerCost) {
+      const x = clickX - refundRangeX;
+      const y = clickY - refundRangeY;
+      //타워가 생성될 때, 좌표를 서버에 저장한다. 타워가 생성되기 전에 검증한다.
+      sendEvent(3, { X: x, Y: y, gameTowers: towers, level: 0, gold: -towerCost });
+
+      const tower = new Tower(x, y, towerCost, towerImages[0]);
+      towers.push(tower);
+      tower.draw(ctx);
+    } else {
+      showMessage(`금액이 부족합니다. 필요 금액: ${towerCost}원`);
+    }
+    isBuyMode = false;
+    isBuyMode ? (refundTowerButton.disabled = true) : (refundTowerButton.disabled = false);
   }
 });
 
@@ -352,14 +366,15 @@ function gameLoop() {
       if (monster.getMonsterId() === 5) {
         sendEvent(6, { gold: 500 });
       } else {
-        score += 2000;
-        sendEvent(21, { monsterId: monster.getMonsterId() });
+        killCount++;
+        score += (monsterLevel + 1) * killScore;
+        sendEvent(21, { monsterId: monster.getMonsterId(), monsterLevel: monsterLevel });
       }
 
-      if (score % 2000 === 0) {
+      if (killCount === 10) {
         monsterLevel += 1;
-
         sendEvent(6, { gold: 1000 });
+        killCount = 0;
 
         //setInterval(spawnMonster, monsterSpawnInterval);
         if (monsterSpawnInterval !== 1000) {
