@@ -3,6 +3,7 @@ import { CLIENT_VERSION } from '../constants.js';
 import handlerMappings from './handlerMapping.js';
 import { getScore } from '../models/score.model.js';
 import { createMonsters } from '../models/monster.model.js';
+import { createTowers } from '../models/tower.model.js';
 
 export const handleDisconnect = (socket, uuid) => {
   removeUser(socket.id); // 사용자 삭제
@@ -13,6 +14,7 @@ export const handleDisconnect = (socket, uuid) => {
 export const handleConnection = async (socket, userUUID) => {
   const highScore = await getScore(socket.handshake.query);
 
+  createTowers(userUUID);
   createMonsters(userUUID);
 
   console.log(`New user connected: ${userUUID} with socket ID ${socket.id}`);

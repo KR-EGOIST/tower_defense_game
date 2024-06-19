@@ -1,9 +1,11 @@
 import { addUserGold } from '../models/gold.model.js';
 import { clearMonsters, getMonsters } from '../models/monster.model.js';
+import { clearTowers } from '../models/tower.model.js';
 import { setScore, getScore } from '../models/score.model.js';
 
 // 게임 시작 시 작동하는 핸들러
 export const gameStart = (uuid, payload) => {
+  clearTowers(uuid);
   clearMonsters(uuid);
   addUserGold(uuid);
   return { status: 'success', message: 'Game Start' };

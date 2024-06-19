@@ -1,5 +1,5 @@
 import { getGold, setGold } from '../models/gold.model.js';
-import { addTower, getTowerIndex, getTowers, removeTower } from '../models/tower.model.js';
+import { getTowers, removeTower, setTower } from '../models/tower.model.js';
 
 // 클라이언트 타워 vs 서버 타워 비교 함수
 function compareTowers(currentTowers, gameTowers) {
@@ -54,7 +54,7 @@ export const towerAddOnHandler = (userId, payload) => {
   userGold += payload.gold;
   setGold(userId, userGold);
 
-  addTower(userId, payload.X, payload.Y, payload.level);
+  setTower(userId, payload.X, payload.Y, payload.level);
   return {
     status: 'success',
     message: `Tower Update: ${payload.X}, ${payload.Y}`,
@@ -63,9 +63,12 @@ export const towerAddOnHandler = (userId, payload) => {
   };
 };
 
+// 타워 업그레이드 핸들러
 export const upgradeTowerHandler = (userId, payload) => {
   const towers = getTowers(userId);
-  const index = getTowerIndex(userId, payload.X, payload.Y);
+  const index = towers.findIndex(
+    (element) => element.tower.X === payload.X && element.tower.Y === payload.Y,
+  );
 
   let userGold = getGold(userId);
   if (userGold === undefined) {
@@ -89,8 +92,10 @@ export const upgradeTowerHandler = (userId, payload) => {
 
 // 타워를 환불합니다.
 export const towerRemoveHandler = (userId, payload) => {
-  const { X, Y } = payload;
-  const index = getTowerIndex(userId, X, Y);
+  const towers = getTowers(userId);
+  const index = towers.findIndex(
+    (element) => element.tower.X === payload.X && element.tower.Y === payload.Y,
+  );
 
   let userGold = getGold(userId);
   if (userGold === undefined) {
@@ -107,7 +112,7 @@ export const towerRemoveHandler = (userId, payload) => {
   userGold += payload.gold;
   setGold(userId, userGold);
 
-  removeTower(index);
+  removeTower(userId, index);
 
   return { status: 'success', message: 'Tower removed successfully', handlerId: 5, gold: userGold };
 };
