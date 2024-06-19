@@ -13,7 +13,8 @@ let id = localStorage.getItem('userId');
 // uuid를 저장할 userId 변수
 let userId;
 
-const NUM_OF_MONSTERS = 5; // 몬스터 개수
+const NUM_OF_MONSTERS = 6; // 몬스터 개수
+const NUM_OF_TOWERS = 4; // 타워 업그레이드 개수
 
 let userGold = 0; // 유저 골드
 let base; // 기지 객체
@@ -26,6 +27,7 @@ let towerMaxLevel = 3; // 타워 최대 레벨
 let monsterLevel = 0; // 몬스터 레벨
 let monsterSpawnInterval = 5000; // 몬스터 생성 주기
 let intervalId = null;
+let goldGoblinintervalId = null;
 const monsters = [];
 const towers = [];
 
@@ -38,8 +40,12 @@ let isRefundMode = false; // 타워 환불 모드(기본off)
 const backgroundImage = new Image();
 backgroundImage.src = 'images/bg.webp';
 
-const towerImage = new Image();
-towerImage.src = 'images/tower.png';
+const towerImages = [];
+for (let i = 1; i <= NUM_OF_TOWERS; i++) {
+  const img = new Image();
+  img.src = `images/tower${i}.png`;
+  towerImages.push(img);
+}
 
 const baseImage = new Image();
 baseImage.src = 'images/base.png';
@@ -155,9 +161,9 @@ function placeInitialTowers() {
     //타워가 생성될 때, 좌표를 서버에 저장한다. 타워가 생성되기 전에 검증한다.
     sendEvent(3, { X: x, Y: y, gameTowers: towers, level: 0, gold: 0 });
 
-    const tower = new Tower(x, y, towerCost);
+    const tower = new Tower(x, y, towerCost, towerImages[0]);
     towers.push(tower);
-    tower.draw(ctx, towerImage);
+    tower.draw(ctx);
   }
 }
 
@@ -174,9 +180,9 @@ function placeNewTower() {
     //타워가 생성될 때, 좌표를 서버에 저장한다. 타워가 생성되기 전에 검증한다.
     sendEvent(3, { X: x, Y: y, gameTowers: towers, level: 0, gold: -towerCost });
 
-    const tower = new Tower(x, y);
+    const tower = new Tower(x, y, towerCost, towerImages[0]);
     towers.push(tower);
-    tower.draw(ctx, towerImage);
+    tower.draw(ctx);
     console.log(`타워 위치: X=${tower.x}, Y=${tower.y}`);
   } else {
     alert(`타워 구매비용은 ${towerCost}원 입니다`);
@@ -226,7 +232,7 @@ canvas.addEventListener('click', (event) => {
           if (upgrade) {
             if (userGold >= 100) {
               const towerLevel = tower.getTowerLevel();
-              tower.setTowerLevel(towerLevel + 1);
+              tower.setTowerLevel(towerLevel + 1, towerImages[towerLevel + 1]);
               sendEvent(4, { X: tower.x, Y: tower.y, level: towerLevel + 1, gold: -100 });
             } else {
               alert(`타워 업그레이드 비용은 100Gold 입니다`);
@@ -247,7 +253,12 @@ function placeBase() {
 }
 
 function spawnMonster() {
-  monsters.push(new Monster(monsterPath, monsterImages, monsterLevel));
+  const imageIndex = Math.floor(Math.random() * (monsterImages.length - 1));
+  monsters.push(new Monster(monsterPath, monsterImages, imageIndex, monsterLevel));
+}
+
+function spawnGoldGoblin() {
+  monsters.push(new Monster(monsterPath, monsterImages, 5, monsterLevel));
 }
 
 function gameLoop() {
@@ -267,7 +278,7 @@ function gameLoop() {
 
   // 타워 그리기 및 몬스터 공격 처리
   towers.forEach((tower) => {
-    tower.draw(ctx, towerImage);
+    tower.draw(ctx);
     tower.updateCooldown();
     monsters.forEach((monster) => {
       const distance = Math.sqrt(
@@ -326,6 +337,7 @@ function initGame() {
   placeInitialTowers(); // 설정된 초기 타워 개수만큼 사전에 타워 배치
   placeBase(); // 기지 배치
 
+  startGoldGoblinSpawning(); //황금 고블린 생성
   startSpawning(); // 몬스터 생성 시작
   gameLoop(); // 게임 루프 최초 실행
   isInitGame = true;
@@ -341,10 +353,10 @@ function getCookieValue(name) {
 // 이미지 로딩 완료 후 서버와 연결하고 게임 초기화
 Promise.all([
   new Promise((resolve) => (backgroundImage.onload = resolve)),
-  new Promise((resolve) => (towerImage.onload = resolve)),
   new Promise((resolve) => (baseImage.onload = resolve)),
   new Promise((resolve) => (pathImage.onload = resolve)),
   ...monsterImages.map((img) => new Promise((resolve) => (img.onload = resolve))),
+  ...towerImages.map((img) => new Promise((resolve) => (img.onload = resolve))),
 ]).then(() => {
   /* 서버 접속 코드 (여기도 완성해주세요!) */
   serverSocket = io('http://localhost:8080', {
@@ -377,6 +389,16 @@ function startSpawning() {
   }
   // 새로운 interval 시작
   intervalId = setInterval(spawnMonster, monsterSpawnInterval);
+}
+
+//황금 고블린 스폰주기 설정
+function startGoldGoblinSpawning() {
+  // 기존 interval이 있다면 중지
+  if (goldGoblinintervalId !== null) {
+    clearInterval(goldGoblinintervalId);
+  }
+  // 새로운 interval 시작
+  goldGoblinintervalId = setInterval(spawnGoldGoblin, monsterSpawnInterval * 3);
 }
 
 // 타워 구매 버튼
