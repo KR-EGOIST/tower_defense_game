@@ -1,7 +1,7 @@
 import { Base } from './base.js';
 import { Monster } from './monster.js';
 import { Tower } from './tower.js';
-import { CLIENT_VERSION } from './Constants.js';
+import { CLIENT_VERSION } from './constants.js';
 import { handleResponse } from '../handlers/helper.js';
 
 let serverSocket; // 서버 웹소켓 객체
