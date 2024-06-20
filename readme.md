@@ -10,7 +10,7 @@
 
 ## ✨ AWS 배포 링크
 
-### [AWS링크]
+### [AWS링크](http://kregoist.shop:8080/)
 
 ## 👋 소개
 
