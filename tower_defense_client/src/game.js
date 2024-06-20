@@ -422,7 +422,7 @@ Promise.all([
   ...towerImages.map((img) => new Promise((resolve) => (img.onload = resolve))),
 ]).then(() => {
   /* 서버 접속 코드 (여기도 완성해주세요!) */
-  serverSocket = io('http://3.34.145.128:8080', {
+  serverSocket = io('http://kregoist.shop:8080', {
     query: {
       clientVersion: CLIENT_VERSION,
       id: id,

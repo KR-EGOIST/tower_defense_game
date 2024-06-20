@@ -1,4 +1,4 @@
-import { addUserGold } from '../models/gold.model.js';
+import { addUserGold, initGold } from '../models/gold.model.js';
 import { clearMonsters, getMonsters } from '../models/monster.model.js';
 import { clearTowers } from '../models/tower.model.js';
 import { setScore, getScore } from '../models/score.model.js';
@@ -7,6 +7,7 @@ import { setScore, getScore } from '../models/score.model.js';
 export const gameStart = (uuid, payload) => {
   clearTowers(uuid);
   clearMonsters(uuid);
+  initGold(uuid);
   addUserGold(uuid);
   return { status: 'success', message: 'Game Start' };
 };
