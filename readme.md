@@ -8,7 +8,7 @@
 
 ### [OpenGameArt](https://opengameart.org/)
 
-## ✨ AWS 배포 링크 (지금은 닫혀 있습니다.)
+## ✨ AWS 배포 링크 (지금은 서버가 닫혀 있습니다.)
 
 ### [AWS링크](http://kregoist.shop:8080/)
 
